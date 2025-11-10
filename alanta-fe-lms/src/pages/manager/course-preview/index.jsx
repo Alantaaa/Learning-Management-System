@@ -15,6 +15,14 @@ export default function ManageCoursePreviewPage() {
     setActiveContent(content);
   };
 
+  const handleNextContent = (content) => {
+    const currIndex = course?.details?.findIndex((val) => val._id === content._id)
+
+    if (currIndex < course?.details.length -1) {
+      handleChangeContent(course.details[currIndex +1])
+    }
+  }
+
   return (
     <div className="flex min-h-screen">
       <aside className="sidebar-container fixed h-[calc(100vh-20px)] w-full max-w-[330px] my-[10px] ml-[10px] bg-[#060A23] overflow-hidden flex flex-1 rounded-[20px]">
@@ -44,7 +52,7 @@ export default function ManageCoursePreviewPage() {
                   <button
                     onClick={() => handleChangeContent(item)}
                     type="button"
-                    className="w-full"
+                    className="w-full text-left"
                   >
                     <div className="flex items-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#070B24] border-[#24283E] shadow-[-10px_-6px_10px_0_#181A35_inset]">
                       <img
@@ -145,9 +153,9 @@ export default function ManageCoursePreviewPage() {
         </div>
         <div className="relative flex flex-col gap-[26px]">
           {activeContent?.type === "text" ? (
-            <ContentText />
+            <ContentText content={activeContent} handleNext={handleNextContent}/>
           ) : (
-            <ContentVideo content={activeContent} />
+            <ContentVideo content={activeContent} handleNext={handleNextContent} />
           )}
         </div>
       </main>
