@@ -1,12 +1,12 @@
 import React from "react";
 
-export default function ContentVideo(){
+export default function ContentVideo({content}){
     return(
         <>
             <div className="flex shrink-0 h-[calc(100vh-110px-104px)] rounded-[20px] overflow-hidden">
             <iframe
               className="w-full aspect-video"
-              src="https://www.youtube.com/embed/tYyPdH32faE?si=heerM3KnIDqdfrZJ"
+              src={`https://www.youtube.com/embed/${content?.youtubeId}?si=heerM3KnIDqdfrZJ`}
               title="YouTube video player"
               frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -16,7 +16,7 @@ export default function ContentVideo(){
           </div>
           <div className="flex items-center justify-between gap-5">
             <h1 className="font-bold text-[32px] leading-[48px]">
-              Install Figma Plugins
+             {content?.title}
             </h1>
             <button
               type="button"
