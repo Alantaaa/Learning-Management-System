@@ -29,7 +29,7 @@ app.options(/.*/, cors());
 
 app.use(express.json());
 app.use(express.static("public"));
-app.use("/uploads", express.static("uploads")); // Tambah ini
+app.use("/uploads", express.static("uploads")); 
 
 app.get("/", (req, res) => {
   res.json({ text: "Hello World" });

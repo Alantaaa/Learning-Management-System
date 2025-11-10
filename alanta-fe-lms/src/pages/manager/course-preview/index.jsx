@@ -1,19 +1,31 @@
 import React from "react";
 import ContentText from "./content-text";
 import ContentVideo from "./content-video";
+import { useState } from "react";
+import { Link, useLoaderData, useParams } from "react-router-dom";
 
 export default function ManageCoursePreviewPage() {
+  const course = useLoaderData();
+  const { id } = useParams();
+
+  console.log(course);
+  const [activeContent, setActiveContent] = useState(course?.details[0]);
+
+  const handleChangeContent = (content) => {
+    setActiveContent(content);
+  };
+
   return (
     <div className="flex min-h-screen">
       <aside className="sidebar-container fixed h-[calc(100vh-20px)] w-full max-w-[330px] my-[10px] ml-[10px] bg-[#060A23] overflow-hidden flex flex-1 rounded-[20px]">
         <div className="scroll-container flex w-full overflow-y-scroll hide-scrollbar">
           <nav className="flex flex-col w-full h-fit p-[30px] gap-[30px] z-10">
-            <a
-              href="manage-course.html"
+            <Link
+              to={`/manager/courses/${id}`}
               className="font-semibold text-white hover:underline"
             >
               <span>Back to Dashboard</span>
-            </a>
+            </Link>
             <div className="flex flex-col gap-4">
               <div className="flex shrink-0 w-[130px] h-[100px] rounded-[14px] bg-[#D9D9D9] overflow-hidden">
                 <img
@@ -23,110 +35,37 @@ export default function ManageCoursePreviewPage() {
                 />
               </div>
               <h2 className="font-bold text-xl leading-[34px] text-white">
-                Mastering React 18 Pro TypeScript Development
+                {course?.name}
               </h2>
             </div>
             <ul className="flex flex-col gap-4">
-              <li>
-                <a href="course-learning-text.html">
-                  <div className="flex items-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#070B24] border-[#24283E] shadow-[-10px_-6px_10px_0_#181A35_inset]">
-                    <img
-                      src="/assets/images/icons/note-white.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <span className="w-full font-semibold text-white line-clamp-1 transition-all duration-300 hover:line-clamp-none">
-                      Persiapan fundamental
-                    </span>
-                  </div>
-                </a>
-              </li>
-              <li>
-                <a href="course-learning-video.html">
-                  <div className="flex items-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#070B24] border-[#24283E] shadow-[-10px_-6px_10px_0_#181A35_inset]">
-                    <img
-                      src="/assets/images/icons/video-play-white.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <span className="w-full font-semibold text-white line-clamp-1 transition-all duration-300 hover:line-clamp-none">
-                      Install figma plugins
-                    </span>
-                  </div>
-                </a>
-              </li>
-              <li>
-                <a href="course-learning-text.html">
-                  <div className="flex items-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#662FFF] border-[#8661EE] shadow-[-10px_-6px_10px_0_#7F33FF_inset]">
-                    <img
-                      src="/assets/images/icons/note-white.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <span className="w-full font-semibold text-white line-clamp-1 transition-all duration-300 hover:line-clamp-none">
-                      Pengenalan UI UX
-                    </span>
-                  </div>
-                </a>
-              </li>
-              <li>
-                <a href="course-learning-text.html">
-                  <div className="flex items-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#070B24] border-[#24283E] shadow-[-10px_-6px_10px_0_#181A35_inset]">
-                    <img
-                      src="/assets/images/icons/note-white.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <span className="w-full font-semibold text-white line-clamp-1 transition-all duration-300 hover:line-clamp-none">
-                      Mengapa UI mobil le...
-                    </span>
-                  </div>
-                </a>
-              </li>
-              <li>
-                <a href="course-learning-video.html">
-                  <div className="flex items-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#070B24] border-[#24283E] shadow-[-10px_-6px_10px_0_#181A35_inset]">
-                    <img
-                      src="/assets/images/icons/video-play-white.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <span className="w-full font-semibold text-white line-clamp-1 transition-all duration-300 hover:line-clamp-none">
-                      Bikin UI components
-                    </span>
-                  </div>
-                </a>
-              </li>
-              <li>
-                <a href="course-learning-video.html">
-                  <div className="flex items-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#070B24] border-[#24283E] shadow-[-10px_-6px_10px_0_#181A35_inset]">
-                    <img
-                      src="/assets/images/icons/video-play-white.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <span className="w-full font-semibold text-white line-clamp-1 transition-all duration-300 hover:line-clamp-none">
-                      Bikin UI components
-                    </span>
-                  </div>
-                </a>
-              </li>
-              <li>
-                <a href="course-learning-text.html">
-                  <div className="flex items-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#070B24] border-[#24283E] shadow-[-10px_-6px_10px_0_#181A35_inset]">
-                    <img
-                      src="/assets/images/icons/note-white.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <span className="w-full font-semibold text-white line-clamp-1 transition-all duration-300 hover:line-clamp-none">
-                      Persiapan fundamental
-                    </span>
-                  </div>
-                </a>
-              </li>
-              <li>
-                <a href="course-learning-video.html">
+              {course?.details?.map((item) => (
+                <li key={item._id}>
+                  <button
+                    onClick={() => handleChangeContent(item)}
+                    type="button"
+                    className="w-full"
+                  >
+                    <div className="flex items-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#070B24] border-[#24283E] shadow-[-10px_-6px_10px_0_#181A35_inset]">
+                      <img
+                        src={`/assets/images/icons/${
+                          item?.type === "text"
+                            ? "note-white"
+                            : "video-play-white"
+                        }.svg
+                      `}
+                        className="w-6 h-6"
+                        alt="icon"
+                      />
+                      <span className="w-full font-semibold text-white line-clamp-1 transition-all duration-300 hover:line-clamp-none">
+                        {item?.title}
+                      </span>
+                    </div>
+                  </button>
+                </li>
+              ))}
+              {/*<li>
+                <Link to="course-learning-video.html">
                   <div className="flex items-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#070B24] border-[#24283E] shadow-[-10px_-6px_10px_0_#181A35_inset]">
                     <img
                       src="/assets/images/icons/video-play-white.svg"
@@ -137,50 +76,8 @@ export default function ManageCoursePreviewPage() {
                       Install figma plugins
                     </span>
                   </div>
-                </a>
-              </li>
-              <li>
-                <a href="course-learning-text.html">
-                  <div className="flex items-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#070B24] border-[#24283E] shadow-[-10px_-6px_10px_0_#181A35_inset]">
-                    <img
-                      src="/assets/images/icons/note-white.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <span className="w-full font-semibold text-white line-clamp-1 transition-all duration-300 hover:line-clamp-none">
-                      Persiapan fundamental
-                    </span>
-                  </div>
-                </a>
-              </li>
-              <li>
-                <a href="course-learning-video.html">
-                  <div className="flex items-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#070B24] border-[#24283E] shadow-[-10px_-6px_10px_0_#181A35_inset]">
-                    <img
-                      src="/assets/images/icons/video-play-white.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <span className="w-full font-semibold text-white line-clamp-1 transition-all duration-300 hover:line-clamp-none">
-                      Install figma plugins
-                    </span>
-                  </div>
-                </a>
-              </li>
-              <li>
-                <a href="course-learning-finished.html">
-                  <div className="flex items-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 hover:bg-[#662FFF] hover:border-[#8661EE] hover:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#070B24] border-[#24283E] shadow-[-10px_-6px_10px_0_#181A35_inset]">
-                    <img
-                      src="/assets/images/icons/tick-circle-white.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <span className="w-full font-semibold text-white line-clamp-1 transition-all duration-300 hover:line-clamp-none">
-                      Finished
-                    </span>
-                  </div>
-                </a>
-              </li>
+                </Link>
+              </li>*/}
             </ul>
           </nav>
         </div>
@@ -231,24 +128,27 @@ export default function ManageCoursePreviewPage() {
             <div id="ProfileDropdown" className="absolute top-full hidden">
               <ul className="flex flex-col w-[200px] rounded-[20px] border border-[#CFDBEF] p-5 gap-4 bg-white mt-4">
                 <li className="font-semibold">
-                  <a href="#">My Account</a>
+                  <Link to="#">My Account</Link>
                 </li>
                 <li className="font-semibold">
-                  <a href="#">Subscriptions</a>
+                  <Link to="#">Subscriptions</Link>
                 </li>
                 <li className="font-semibold">
-                  <a href="#">Settings</a>
+                  <Link to="#">Settings</Link>
                 </li>
                 <li className="font-semibold">
-                  <a href="signin.html">Logout</a>
+                  <Link to="signin.html">Logout</Link>
                 </li>
               </ul>
             </div>
           </div>
         </div>
         <div className="relative flex flex-col gap-[26px]">
-          <ContentText />
-          <ContentVideo />
+          {activeContent?.type === "text" ? (
+            <ContentText />
+          ) : (
+            <ContentVideo content={activeContent} />
+          )}
         </div>
       </main>
     </div>
