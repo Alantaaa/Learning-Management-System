@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import { email } from "zod";
-import { required } from "zod/mini";
 
 const userModel = new mongoose.Schema({
   name: {
