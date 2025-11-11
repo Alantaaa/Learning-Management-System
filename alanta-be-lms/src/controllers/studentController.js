@@ -1,7 +1,7 @@
-import userModel from "../models/userModel";
+import userModel from "../models/userModel.js";
 import bcrypt from "bcrypt";
-import { mutateStudentSchema } from "../utils/schema";
-import courseModel from "../models/courseModel";
+import { mutateStudentSchema } from "../utils/schema.js";
+import courseModel from "../models/courseModel.js";
 
 export const getStudents = async (req, res) => {
   try {
@@ -115,3 +115,27 @@ export const updateStudents = async (req, res) => {
     }
 }
 
+export const deleteStudents = async (req, res) => {
+    try {
+        const {id} = req.params;
+
+        await courseModel.findByOneAndUpdate(
+            {
+                students: id
+            },
+            {
+                $pull: { students: id }
+            }
+        )
+        await userModel.findByIdAndDelete(id)
+        return res.json({
+            message: "Student deleted successfully", 
+        })
+        
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            message: 'Internal server error'
+        });
+    }
+}
