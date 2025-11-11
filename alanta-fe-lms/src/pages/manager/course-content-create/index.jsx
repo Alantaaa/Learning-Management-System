@@ -183,8 +183,7 @@ export default function ManageContentCreatePage() {
               data={content?.text}
               onChange={(event, editor) => {
                 const htmlData = editor.getData();
-                const plainText = htmlData.replace(/<[^>]*>?/gm, "").trim();
-                setValue("text", plainText);
+                setValue("text", htmlData);
               }}
             />
 
