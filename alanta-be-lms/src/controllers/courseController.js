@@ -99,8 +99,6 @@ export const postCourse = async (req, res) => {
   try {
     const body = req.body;
 
-    console.log(req.file);
-
     const parse = mutateCourseSchema.safeParse(body);
 
     if (!parse.success) {
