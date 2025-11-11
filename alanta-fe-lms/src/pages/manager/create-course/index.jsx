@@ -12,6 +12,10 @@ import { createCourse, updateCourse } from "../../../services/courseService";
 export default function ManageCreateCoursePage() {
   const data = useLoaderData();
   const { id } = useParams();
+  const navigate = useNavigate();
+  const inputFileRef = useRef(null);
+
+  const [file, setFile] = useState(null); // bisa berupa File object (baru) atau string URL (lama)
 
   const {
     register,
@@ -24,17 +28,12 @@ export default function ManageCreateCoursePage() {
       data.course === null ? createCourseSchema : updateCourseSchema
     ),
     defaultValues: {
-      name: data?.course?.name,
-      tagline: data?.course?.tagline,
-      categoryId: data?.course?.category,
-      description: data?.course?.description,
+      name: data?.course?.name || "",
+      tagline: data?.course?.tagline || "",
+      categoryId: "",
+      description: data?.course?.description || "",
     },
   });
-
-  const [file, setFile] = useState(null);
-  const inputFileRef = useRef(null);
-
-  const navigate = useNavigate();
 
   const mutateCreate = useMutation({
     mutationFn: (data) => createCourse(data),
@@ -43,28 +42,42 @@ export default function ManageCreateCoursePage() {
   const mutateUpdate = useMutation({
     mutationFn: (data) => updateCourse(data, id),
   });
+
+  // ✅ Prefill data course untuk mode edit
   useEffect(() => {
     if (data?.course) {
+      // cari _id kategori berdasarkan name karena dari API hanya ada category.name
+      const matchedCategory = data?.categories?.data?.find(
+        (item) => item.name === data.course.category?.name
+      );
+
       reset({
         name: data.course.name || "",
         tagline: data.course.tagline || "",
-        categoryId: data.course.category?._id || data.course.category || "", // handle string/obj
+        categoryId: matchedCategory?._id || "",
         description: data.course.description || "",
       });
+
+      // isi file dari thumbnail lama (pakai thumbnail_url kalau ada)
+      if (data.course.thumbnail_url) {
+        setFile(data.course.thumbnail_url);
+      }
     }
   }, [data, reset]);
 
+  // ✅ handle submit create/update
   const onSubmit = async (values) => {
-    console.log(data);
-
     try {
       const formData = new FormData();
-
       formData.append("name", values.name);
-      formData.append("thumbnail", file);
       formData.append("tagline", values.tagline);
       formData.append("categoryId", values.categoryId);
       formData.append("description", values.description);
+
+      // hanya kirim thumbnail baru kalau user upload baru
+      if (file && typeof file !== "string") {
+        formData.append("thumbnail", file);
+      }
 
       if (data.course === null) {
         await mutateCreate.mutateAsync(formData);
@@ -74,7 +87,7 @@ export default function ManageCreateCoursePage() {
 
       navigate("/manager/courses");
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -83,23 +96,21 @@ export default function ManageCreateCoursePage() {
       <header className="flex items-center justify-between gap-[30px]">
         <div>
           <h1 className="font-extrabold text-[28px] leading-[42px]">
-            New Course
+            {data.course ? "Edit Course" : "New Course"}
           </h1>
-          <p className="text-[#838C9D] mt-[1]">Create new future for company</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <a
-            href="#"
-            className="w-fit rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-nowrap"
-          >
-            Import from BWA
-          </a>
+          <p className="text-[#838C9D] mt-[1]">
+            {data.course
+              ? "Update your existing course"
+              : "Create new future for company"}
+          </p>
         </div>
       </header>
+
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col w-[550px] rounded-[30px] p-[30px] gap-[30px] bg-[#F8FAFB]"
       >
+        {/* Course Name */}
         <div className="flex flex-col gap-[10px]">
           <label htmlFor="title" className="font-semibold">
             Course Name
@@ -122,6 +133,8 @@ export default function ManageCreateCoursePage() {
             {errors?.name?.message}
           </span>
         </div>
+
+        {/* Thumbnail */}
         <div className="relative flex flex-col gap-[10px]">
           <label htmlFor="thumbnail" className="font-semibold">
             Add a Thumbnail
@@ -143,14 +156,21 @@ export default function ManageCreateCoursePage() {
               />
               <span className="text-[#838C9D]">Add an attachment</span>
             </button>
+
+            {/* ✅ Preview thumbnail lama atau baru */}
             <img
               id="thumbnail-preview"
-              src={file !== null ? URL.createObjectURL(file) : "null"}
-              className={`w-full h-full object-cover ${
-                file !== null ? "block" : "hidden"
-              }`}
+              src={
+                file
+                  ? typeof file === "string"
+                    ? file // URL lama dari backend
+                    : URL.createObjectURL(file) // file baru dari input
+                  : null
+              }
+              className={`w-full h-full object-cover ${file ? "block" : "hidden"}`}
               alt="thumbnail"
             />
+
             <button
               type="button"
               id="delete-preview"
@@ -158,13 +178,14 @@ export default function ManageCreateCoursePage() {
                 setFile(null);
                 setValue("thumbnail", null);
               }}
-              className={`absolute right-[10px] bottom-[10px] w-12 h-12 rounded-full z-10 ${
-                file !== null ? "block" : "hidden"
+              className={`absolute right-[10px] bottom-[10px] w-12 h-12 rounded-full bg-[#FF435A] flex justify-center items-center ${
+                file ? "flex" : "hidden"
               }`}
             >
               <img src="/assets/images/icons/delete.svg" alt="delete" />
             </button>
           </div>
+
           <input
             {...register("thumbnail")}
             ref={inputFileRef}
@@ -179,10 +200,13 @@ export default function ManageCreateCoursePage() {
             accept="image/*"
             className="absolute bottom-0 left-1/4 -z-10"
           />
+
           <span className="error-message text-[#FF435A]">
             {errors?.thumbnail?.message}
           </span>
         </div>
+
+        {/* Tagline */}
         <div className="flex flex-col gap-[10px]">
           <label htmlFor="tagline" className="font-semibold">
             Course Tagline
@@ -205,6 +229,8 @@ export default function ManageCreateCoursePage() {
             {errors?.tagline?.message}
           </span>
         </div>
+
+        {/* Category */}
         <div className="flex flex-col gap-[10px]">
           <label htmlFor="category" className="font-semibold">
             Select Category
@@ -229,7 +255,6 @@ export default function ManageCreateCoursePage() {
                 </option>
               ))}
             </select>
-
             <img
               src="/assets/images/icons/arrow-down.svg"
               className="w-6 h-6"
@@ -240,11 +265,13 @@ export default function ManageCreateCoursePage() {
             {errors?.categoryId?.message}
           </span>
         </div>
+
+        {/* Description */}
         <div className="flex flex-col gap-[10px]">
           <label htmlFor="desc" className="font-semibold">
             Description
           </label>
-          <div className="flex w-full rounded-[20px] border border-[#CFDBEF] gap-3 p-5  transition-all duration-300 focus-within:ring-2 focus-within:ring-[#662FFF]">
+          <div className="flex w-full rounded-[20px] border border-[#CFDBEF] gap-3 p-5 transition-all duration-300 focus-within:ring-2 focus-within:ring-[#662FFF]">
             <img
               src="/assets/images/icons/note-black.png"
               className="w-6 h-6"
@@ -262,6 +289,8 @@ export default function ManageCreateCoursePage() {
             {errors?.description?.message}
           </span>
         </div>
+
+        {/* Buttons */}
         <div className="flex items-center gap-[14px]">
           <button
             type="button"
@@ -278,7 +307,7 @@ export default function ManageCreateCoursePage() {
             }
             className="w-full rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
           >
-            Create Now
+            {data.course ? "Update Course" : "Create Now"}
           </button>
         </div>
       </form>
