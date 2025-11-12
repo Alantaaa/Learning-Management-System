@@ -5,12 +5,12 @@ import SignUpPage from "../pages/SignUp";
 import SuccessCheckoutPage from "../pages/SuccessCheckout";
 import LayoutDashboard from "../components/layout";
 import ManageCoursePage from "../pages/manager/courses";
-import ManageCrateCoursePage from "../pages/manager/create-course";
 import ManageCourseDetailPage from "../pages/manager/course-detail";
 import ManageContentCreatePage from "../pages/manager/course-content-create";
 import ManageCreateCoursePage from "../pages/manager/create-course";
 import ManageCoursePreviewPage from "../pages/manager/course-preview";
 import ManageStudentsPage from "../pages/manager/students";
+import ManageStudentsCreatePage from "../pages/manager/student-create";
 import StudentPage from "../pages/student/StudentOverview";
 import secureLocalStorage from "react-secure-storage";
 import { STORAGE_KEY } from "../utils/const";
@@ -21,11 +21,12 @@ import {
   getCoursesDetail,
   getDetailContent,
 } from "../services/courseService";
+import { getDetailStudent, getStudents } from "../services/studentService";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <SignInPage/>,
+    element: <SignInPage />,
   },
   {
     path: "/manager/sign-in",
@@ -195,44 +196,24 @@ const router = createBrowserRouter([
       {
         path: "students",
         loader: async () => {
-          try {
-            const session = secureLocalStorage.getItem(STORAGE_KEY);
+          const students = await getStudents();
 
-            if (!session) {
-              return { students: [], error: "No session found" };
-            }
-
-            const sessionData =
-              typeof session === "string" ? JSON.parse(session) : session;
-
-            const token = sessionData?.token;
-
-            if (!token) {
-              return { students: [], error: "No token found" };
-            }
-
-            // Fetch students data jika ada service-nya
-            // const data = await getStudents(token);
-            // return data;
-
-            return { students: [], data: sessionData };
-          } catch (error) {
-            if (
-              error.response?.status === 401 ||
-              error.response?.status === 403
-            ) {
-              secureLocalStorage.removeItem(STORAGE_KEY);
-              throw redirect("/manager/sign-in");
-            }
-
-            console.error("Error fetching students:", error);
-            return {
-              students: [],
-              error: error.message || "Failed to fetch students",
-            };
-          }
+          return students?.data;
         },
         element: <ManageStudentsPage />,
+      },
+      {
+        path: "students/create",
+        element: <ManageStudentsCreatePage />,
+      },
+      {
+        path: "students/edit/:id",
+        loader: async ({ params }) => {
+          const student = await getDetailStudent(params.id);
+
+          return student?.data;
+        },
+        element: <ManageStudentsCreatePage />,
       },
     ],
   },

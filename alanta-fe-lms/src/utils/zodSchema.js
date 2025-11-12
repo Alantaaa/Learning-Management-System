@@ -61,3 +61,19 @@ export const mutateContentSchema = z
       }
     }
   });
+
+export const createStudentSchema = z.object({
+  name: z
+    .string()
+    .min(5, { message: "String must contain at least 5 character(s)" }),
+  email: z.string().email(),
+  password: z.string().min(5, { message: "String must contain at least 5 character(s)" }),
+  photo: z
+    .any()
+    .refine((file) => file?.name, { message: "Thumbnail is required" }),
+});
+
+export const updateStudentSchema = createStudentSchema.omit({
+  password: true,
+  photo: true 
+})

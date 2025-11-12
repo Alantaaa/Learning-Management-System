@@ -1,8 +1,14 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import StudentItem from "./student-item";
 
 export default function ManageStudentsPage() {
+const students = useLoaderData()
+
+console.log(students);
+
+
+
   return (
     <>
       <header className="flex items-center justify-between gap-[30px]">
@@ -22,7 +28,7 @@ export default function ManageStudentsPage() {
             Import File
           </Link>
           <Link
-            to="#"
+            to="/manager/students/create"
             className="w-fit rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
           >
             Add Student
@@ -33,7 +39,9 @@ export default function ManageStudentsPage() {
         id="CourseList"
         className="flex flex-col w-full rounded-[30px] p-[30px] gap-[30px] bg-[#F8FAFB]"
       >
-        <StudentItem/>
+        {students?.map((item) => 
+          <StudentItem key={item._id} id={item._id} ImgUrl={item.photo_url} name={item.name} totalCourse={item.courses.length}/>
+        )}
         
         {/*<div id="Pagination" className="flex items-center gap-3">
                     <button type="button" className="flex shrink-0 w-9 h-9 rounded-full items-center justify-center text-center transition-all duration-300 hover:bg-[#662FFF] hover:text-white hover:border-0 bg-[#662FFF] text-white">
