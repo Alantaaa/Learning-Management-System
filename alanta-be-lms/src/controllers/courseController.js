@@ -134,7 +134,7 @@ export const postCourse = async (req, res) => {
     await categoryModel.findByIdAndUpdate(
       category._id,
       {
-        $push: {
+        $pull: {
           courses: course._id,
         },
       },
@@ -340,6 +340,115 @@ export const getDetailContent = async (req, res) => {
     return res.json({
       message: "Get Detail Content success!",
       data: content,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const getStudentsByCourseId = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const course = await courseModel.findById(id).select("name").populate({
+      path: "students",
+      select: "name email photo",
+    });
+
+    const photoUrl = `${req.protocol}://${req.get("host")}/uploads/students/`;
+    const studentsMap = course?.students?.map((item) => {
+      return {
+        ...item.toObject(),
+        photo_url: `${photoUrl}${item.photo}`,
+
+      };
+    });
+
+    return res.json({
+      message: "Get student by course success",
+      data: {
+        ...course.toObject(),
+        students: studentsMap,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const postStudentToCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { studentId } = req.body;
+
+    // ✅ 1. Cek apakah course dan student ada
+    const course = await courseModel.findById(id);
+    const student = await userModel.findById(studentId);
+
+    if (!course || !student) {
+      return res.status(404).json({
+        message: "Course or student not found",
+      });
+    }
+
+    // ✅ 2. Cek apakah siswa sudah terdaftar di course
+    const alreadyAdded = course.students.some(
+      (s) => s.toString() === studentId
+    );
+
+    if (alreadyAdded) {
+      return res.status(400).json({
+        success: false,
+        message: "Student is already enrolled in this course",
+      });
+    }
+
+    // ✅ 3. Tambahkan student ke course & course ke student
+    await userModel.findByIdAndUpdate(studentId, {
+      $addToSet: { courses: id }, // 🔒 gunakan $addToSet agar otomatis hindari duplikat
+    });
+
+    await courseModel.findByIdAndUpdate(id, {
+      $addToSet: { students: studentId }, // 🔒 juga gunakan $addToSet
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Student added to course successfully",
+    });
+  } catch (error) {
+    console.error("Error adding student:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const deleteStudentToCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const body = req.body;
+
+    await userModel.findByIdAndUpdate(body.studentId, {
+      $pull: {
+        courses: id,
+      },
+    });
+
+    await courseModel.findByIdAndUpdate(id, {
+      $pull: {
+        students: body.studentId,
+      },
+    });
+
+    return res.json({
+      message: "Delete Student in Course success",
     });
   } catch (error) {
     console.log(error);
