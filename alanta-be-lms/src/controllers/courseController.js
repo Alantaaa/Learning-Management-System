@@ -210,8 +210,14 @@ export const deleteCourse = async (req, res) => {
 
     const course = await courseModel.findById(id);
 
-    const dirname = path.resolve();
+    if (!course) {
+      return res.status(404).json({
+        message: "Course not found",
+      });
+    }
 
+    // 1. Hapus file thumbnail
+    const dirname = path.resolve();
     const filePath = path.join(
       dirname,
       "public/uploads/courses",
@@ -222,15 +228,26 @@ export const deleteCourse = async (req, res) => {
       fs.unlinkSync(filePath);
     }
 
+    // 2. Hapus semua course details yang terkait dengan course ini
+    await courseDetailModel.deleteMany({ course: id });
+
+    // 3. Hapus referensi course dari semua users (manager & students)
+    await userModel.updateMany({ courses: id }, { $pull: { courses: id } });
+
+    // 4. Hapus referensi course dari category
+    await categoryModel.updateMany({ courses: id }, { $pull: { courses: id } });
+
+    // 5. Hapus course dari database
     await courseModel.findByIdAndDelete(id);
 
     return res.json({
-      message: "Delete courses success",
+      message: "Delete course success",
     });
   } catch (error) {
-    console.log(error);
+    console.log("Error deleting course:", error);
     return res.status(500).json({
       message: "Internal server error",
+      error: error.message,
     });
   }
 };
@@ -257,18 +274,17 @@ export const postContentCourse = async (req, res) => {
 
     await content.save();
 
-    // Perbaikan di sini - pastikan await dan cek hasilnya
     const updatedCourse = await courseModel.findByIdAndUpdate(
-      body.courseId, // Langsung pakai body.courseId
+      body.courseId,
       {
         $push: {
           details: content._id,
         },
       },
-      { new: true } // Return document setelah update
+      { new: true } 
     );
 
-    console.log("Updated course:", updatedCourse); // Debug
+    console.log("Updated course:", updatedCourse); 
 
     return res.json({
       message: "Create Content success",
@@ -363,7 +379,6 @@ export const getStudentsByCourseId = async (req, res) => {
       return {
         ...item.toObject(),
         photo_url: `${photoUrl}${item.photo}`,
-
       };
     });
 
@@ -387,7 +402,6 @@ export const postStudentToCourse = async (req, res) => {
     const { id } = req.params;
     const { studentId } = req.body;
 
-    // ✅ 1. Cek apakah course dan student ada
     const course = await courseModel.findById(id);
     const student = await userModel.findById(studentId);
 
@@ -397,7 +411,6 @@ export const postStudentToCourse = async (req, res) => {
       });
     }
 
-    // ✅ 2. Cek apakah siswa sudah terdaftar di course
     const alreadyAdded = course.students.some(
       (s) => s.toString() === studentId
     );
@@ -409,13 +422,12 @@ export const postStudentToCourse = async (req, res) => {
       });
     }
 
-    // ✅ 3. Tambahkan student ke course & course ke student
     await userModel.findByIdAndUpdate(studentId, {
-      $addToSet: { courses: id }, // 🔒 gunakan $addToSet agar otomatis hindari duplikat
+      $addToSet: { courses: id }, 
     });
 
     await courseModel.findByIdAndUpdate(id, {
-      $addToSet: { students: studentId }, // 🔒 juga gunakan $addToSet
+      $addToSet: { students: studentId }, 
     });
 
     return res.status(200).json({

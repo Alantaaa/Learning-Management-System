@@ -25,6 +25,7 @@ import {
 import { getDetailStudent, getStudents } from "../services/studentService";
 import StudentCourseList from "../pages/manager/student-course";
 import StudentForm from "../pages/manager/student-course/student-form";
+import { getOverviews } from "../services/overviewServices";
 
 const router = createBrowserRouter([
   {
@@ -73,6 +74,10 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
+        loader: async () => {
+          const overviews = await getOverviews()
+          return overviews?.data
+        },
         element: <ManagerHome />,
       },
       {
