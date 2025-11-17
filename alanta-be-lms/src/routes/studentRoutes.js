@@ -3,12 +3,14 @@ import multer from "multer";
 import { fileFilter, fileStorage } from "../utils/multer.js";
 import {
   deleteStudent,
+  getCoursesStudents,
   getStudentById,
   getStudents,
   postStudents,
   updateStudents,
 } from "../controllers/studentController.js";
 import { verifyToken } from "../middlewares/verifyToken.js";
+import { get } from "mongoose";
 const studentRoutes = express.Router();
 
 const upload = multer({
@@ -31,5 +33,6 @@ studentRoutes.put(
   updateStudents
 );
 studentRoutes.delete("/students/:id", verifyToken, deleteStudent);
+studentRoutes.get('/students-courses', verifyToken, getCoursesStudents)
 
 export default studentRoutes;

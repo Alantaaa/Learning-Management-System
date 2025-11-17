@@ -84,15 +84,18 @@ export const SignInAction = async (req, res) => {
         message: "User not found",
       });
     }
+
     const comparePassword = bcrypt.compareSync(
       body.password,
       existingUser.password
     );
+
     if (!comparePassword) {
       return res.status(400).json({
         message: "Email / Password incorrect",
       });
     }
+
     const isValidUser = await TransactionModel.findOne({
       user: existingUser._id,
       status: "success",
@@ -113,6 +116,17 @@ export const SignInAction = async (req, res) => {
       process.env.SECRET_KEY_JWT,
       { expiresIn: "1d" }
     );
+
+    // Build photo URL berdasarkan role
+    const photoUrl =
+      existingUser.role === "student"
+        ? `${req.protocol}://${req.get("host")}/uploads/students/${
+            existingUser.photo
+          }`
+        : `${req.protocol}://${req.get("host")}/uploads/managers/${
+            existingUser.photo
+          }`;
+
     return res.json({
       message: "User Logged in success",
       data: {
@@ -120,6 +134,7 @@ export const SignInAction = async (req, res) => {
         email: existingUser.email,
         token,
         role: existingUser.role,
+        photo_url: photoUrl,
       },
     });
   } catch (error) {

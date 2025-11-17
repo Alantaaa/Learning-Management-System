@@ -13,7 +13,7 @@ import ManageStudentsPage from "../pages/manager/students";
 import ManageStudentsCreatePage from "../pages/manager/student-create";
 import StudentPage from "../pages/student/StudentOverview";
 import secureLocalStorage from "react-secure-storage";
-import { STORAGE_KEY } from "../utils/const";
+import { STORAGE_KEY, STUDENT_SESSION } from "../utils/const";
 import { MANAGER_SESSION } from "../utils/const";
 import {
   getCategories,
@@ -22,7 +22,7 @@ import {
   getDetailContent,
   getStudentsCourse,
 } from "../services/courseService";
-import { getDetailStudent, getStudents } from "../services/studentService";
+import { getCoursesStudents, getDetailStudent, getStudents } from "../services/studentService";
 import StudentCourseList from "../pages/manager/student-course";
 import StudentForm from "../pages/manager/student-course/student-form";
 import { getOverviews } from "../services/overviewServices";
@@ -243,19 +243,20 @@ const router = createBrowserRouter([
   },
   {
     path: "/student",
+    id: STUDENT_SESSION,
     loader: async () => {
       try {
         const session = secureLocalStorage.getItem(STORAGE_KEY);
 
         if (!session) {
-          throw redirect("/manager/sign-in");
+          throw redirect("/student/sign-in");
         }
 
         const sessionData =
           typeof session === "string" ? JSON.parse(session) : session;
 
         if (sessionData?.role !== "student") {
-          throw redirect("/manager/sign-in");
+          throw redirect("/student/sign-in");
         }
 
         return sessionData;
@@ -263,54 +264,43 @@ const router = createBrowserRouter([
         if (error instanceof Error && error.status === 302) {
           throw error;
         }
-        throw redirect("/manager/sign-in");
+        throw redirect("/student/sign-in");
       }
     },
     element: <LayoutDashboard isAdmin={false} />,
     children: [
       {
         index: true,
+        loader: async () => {
+          const courses = await getCoursesStudents()
+
+          return courses?.data
+        },
         element: <StudentPage />,
       },
       {
         path: "detail-course/:id",
-        loader: async ({ params }) => {
-          try {
-            const session = secureLocalStorage.getItem(STORAGE_KEY);
+         loader: async ({ params }) => {
+          const course = await getCoursesDetail(params.id, true);
 
-            if (!session) {
-              throw redirect("/manager/sign-in");
-            }
-
-            const sessionData =
-              typeof session === "string" ? JSON.parse(session) : session;
-
-            const token = sessionData?.token;
-
-            if (!token) {
-              throw redirect("/manager/sign-in");
-            }
-
-            // Fetch course detail untuk student
-            // const data = await getStudentCourseDetail(params.id, token);
-            // return data;
-
-            return params;
-          } catch (error) {
-            if (error instanceof Error && error.status === 302) {
-              throw error;
-            }
-            if (error.response?.status === 401) {
-              secureLocalStorage.removeItem(STORAGE_KEY);
-              throw redirect("/manager/sign-in");
-            }
-            throw redirect("/manager/sign-in");
-          }
+          return course?.data;
         },
-        element: <ManageCoursePreviewPage />,
+        element: <ManageCoursePreviewPage isAdmin={false} />,
       },
     ],
   },
+  {
+    path: "/student/sign-in",
+    loader: async () => {
+      const session = secureLocalStorage.getItem(STORAGE_KEY)
+
+      if (session &&  session.role === "student") {
+        throw redirect ('/student')
+      }
+      return true
+    },
+    element: <SignInPage type='student'/>,
+  }
 ]);
 
 export default router;
