@@ -134,7 +134,7 @@ export const postCourse = async (req, res) => {
     await categoryModel.findByIdAndUpdate(
       category._id,
       {
-        $pull: {
+        $push: {
           courses: course._id,
         },
       },
@@ -281,10 +281,10 @@ export const postContentCourse = async (req, res) => {
           details: content._id,
         },
       },
-      { new: true } 
+      { new: true }
     );
 
-    console.log("Updated course:", updatedCourse); 
+    console.log("Updated course:", updatedCourse);
 
     return res.json({
       message: "Create Content success",
@@ -423,11 +423,11 @@ export const postStudentToCourse = async (req, res) => {
     }
 
     await userModel.findByIdAndUpdate(studentId, {
-      $addToSet: { courses: id }, 
+      $addToSet: { courses: id },
     });
 
     await courseModel.findByIdAndUpdate(id, {
-      $addToSet: { students: studentId }, 
+      $addToSet: { students: studentId },
     });
 
     return res.status(200).json({
