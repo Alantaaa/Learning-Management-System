@@ -32,7 +32,7 @@ app.use(
 );
 
 
-app.options("/*", cors());
+//app.options("/*", cors());
 
 // Body parser
 app.use(express.json());
