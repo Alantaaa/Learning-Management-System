@@ -17,26 +17,12 @@ connectDB();
 
 const PORT = process.env.PORT || 3000;
 
-// ✅ CORS - Allow ALL Vercel deployments untuk testing
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (Postman, curl, etc)
-      if (!origin) return callback(null, true);
-      
-      // Allow localhost
-      if (origin.includes('localhost')) return callback(null, true);
-      
-      // Allow any Vercel domain
-      if (origin.includes('vercel.app')) return callback(null, true);
-      
-      callback(new Error('Not allowed by CORS'));
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // ✅ Tambah OPTIONS!
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
+// ✅ CORS - Simple config, allow all
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 
 // Body parser
 app.use(express.json());
