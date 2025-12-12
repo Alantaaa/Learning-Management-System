@@ -10,7 +10,7 @@ import { STORAGE_KEY } from "../../utils/const";
 import Navbar from "../../components/navbar";
 
 export default function SignInPage({type= 'manager'}) {
-  const {
+  const { 
     register,
     handleSubmit,
     formState: { errors },
