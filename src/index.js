@@ -17,7 +17,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // ✅ CORRECT: Handle preflight requests for ALL routes
-app.options('*', cors(corsOptions));
+app.options('/*', cors(corsOptions));
 
 // Body parsers
 app.use(express.json());
