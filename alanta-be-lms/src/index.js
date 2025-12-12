@@ -23,7 +23,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173", // localhost FE
-      "https://alanta-fe-lms.vercel.app", // FE setelah deploy (ubah sesuai nama FE kamu)
+      "https://learning-management-system-alpha-ashen.vercel.app/", // FE setelah deploy (ubah sesuai nama FE kamu)
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -55,8 +55,10 @@ app.use("/api", studentRoutes);
 app.use("/api", overviewRoutes);
 
 // Start server (Works on Vercel + Local)
-app.listen(PORT, () => {
-  console.log(`Server running on PORT ${PORT}`);
-});
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`Server running on PORT ${PORT}`);
+  });
+}
 
 export default app;
