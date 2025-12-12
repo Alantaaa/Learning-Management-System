@@ -31,7 +31,7 @@ app.use(
   })
 );
 
-// OPTIONS handler
+
 app.options("/*", cors());
 
 // Body parser
