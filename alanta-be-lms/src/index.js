@@ -15,24 +15,28 @@ dotenv.config();
 const app = express();
 connectDB();
 
-// PORT untuk Vercel atau local
 const PORT = process.env.PORT || 3000;
 
-// CORS untuk development + production
+// ✅ CORS - Allow ALL Vercel deployments untuk testing
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // localhost FE
-      "https://learning-management-system-alpha-ashen.vercel.app", // FE setelah deploy (ubah sesuai nama FE kamu)
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE" "OPTIONS"],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (Postman, curl, etc)
+      if (!origin) return callback(null, true);
+      
+      // Allow localhost
+      if (origin.includes('localhost')) return callback(null, true);
+      
+      // Allow any Vercel domain
+      if (origin.includes('vercel.app')) return callback(null, true);
+      
+      callback(new Error('Not allowed by CORS'));
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // ✅ Tambah OPTIONS!
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
-
-
-//app.options("/*", cors());
 
 // Body parser
 app.use(express.json());
@@ -54,7 +58,7 @@ app.use("/api", courseRoutes);
 app.use("/api", studentRoutes);
 app.use("/api", overviewRoutes);
 
-// Start server (Works on Vercel + Local)
+// Start server
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {
     console.log(`Server running on PORT ${PORT}`);
