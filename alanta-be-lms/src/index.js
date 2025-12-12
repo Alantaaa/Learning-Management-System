@@ -23,9 +23,9 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173", // localhost FE
-      "https://learning-management-system-alpha-ashen.vercel.app/", // FE setelah deploy (ubah sesuai nama FE kamu)
+      "https://learning-management-system-alpha-ashen.vercel.app", // FE setelah deploy (ubah sesuai nama FE kamu)
     ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE" "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
