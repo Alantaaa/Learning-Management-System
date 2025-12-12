@@ -2,7 +2,8 @@ import axios from "axios";
 import secureLocalStorage from "react-secure-storage";
 import { STORAGE_KEY } from "./const";
 
-const baseURL = import.meta.env.VITE_API_URL;
+// ✅ HARDCODE dengan /api di akhir
+const baseURL = "https://learning-management-sy-git-ce316d-lintang-adya-alantas-projects.vercel.app/api";
 
 const apiInstance = axios.create({
   baseURL,
