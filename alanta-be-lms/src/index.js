@@ -13,77 +13,47 @@ import overviewRoutes from "./routes/overviewRoutes.js";
 dotenv.config();
 
 const app = express();
-
-/* ==============================
-   DATABASE
-================================ */
 connectDB();
 
-/* ==============================
-   CORS — WAJIB DI ATAS SEMUA ROUTE
-================================ */
-const ALLOWED_ORIGIN = "https://learning-management-system-alpha-ashen.vercel.app";
+// 🔥 CORS CONFIG YANG BENAR UNTUK VERCEL
+const corsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://learning-management-sy-git-13edf4-lintang-adya-alantas-projects.vercel.app",
+    "https://learning-management-system-alpha-ashen.vercel.app"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+  ],
+  credentials: false,
+};
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
+// ✅ CORS HARUS DI ATAS SEMUA ROUTE
+app.use(cors(corsOptions));
 
-  // ⛔ PENTING: HANDLE PREFLIGHT
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
+// 🔥 HANDLE PREFLIGHT REQUEST
+app.options("*", cors(corsOptions));
 
-  next();
-});
-
-app.use(
-  cors({
-    origin: ALLOWED_ORIGIN,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
-
-/* ==============================
-   BODY PARSER
-================================ */
+// Body parser
 app.use(express.json());
 
-/* ==============================
-   STATIC FILES
-================================ */
-app.use("/uploads", express.static("public/uploads"));
+// Static
+app.use(express.static("public"));
 
-/* ==============================
-   ROUTES
-================================ */
+// Test route
 app.get("/", (req, res) => {
   res.json({ message: "Backend LMS Online 🚀" });
 });
 
+// API Routes
 app.use("/api", globalRoutes);
 app.use("/api", paymentRoutes);
 app.use("/api", authRoutes);
 app.use("/api", courseRoutes);
 app.use("/api", studentRoutes);
 app.use("/api", overviewRoutes);
-
-/* ==============================
-   LOCAL ONLY
-================================ */
-if (process.env.NODE_ENV !== "production") {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Server running on PORT ${PORT}`);
-  });
-}
 
 export default app;
