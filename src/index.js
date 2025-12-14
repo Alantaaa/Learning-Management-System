@@ -13,26 +13,62 @@ import overviewRoutes from "./routes/overviewRoutes.js";
 dotenv.config();
 
 const app = express();
+
+/* ==============================
+   DATABASE
+================================ */
 connectDB();
 
-const PORT = process.env.PORT || 3000;
+/* ==============================
+   CORS — WAJIB DI ATAS SEMUA ROUTE
+================================ */
+const ALLOWED_ORIGIN = "https://learning-management-system-alpha-ashen.vercel.app";
 
-// ✅ CORS PALING SIMPLE - ALLOW ALL
-app.use(cors());
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
 
-// Body parser
+  // ⛔ PENTING: HANDLE PREFLIGHT
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
+
+app.use(
+  cors({
+    origin: ALLOWED_ORIGIN,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
+/* ==============================
+   BODY PARSER
+================================ */
 app.use(express.json());
 
-// Static folders
-app.use(express.static("public"));
-app.use("/uploads", express.static("uploads"));
+/* ==============================
+   STATIC FILES
+================================ */
+app.use("/uploads", express.static("public/uploads"));
 
-// Default route
+/* ==============================
+   ROUTES
+================================ */
 app.get("/", (req, res) => {
   res.json({ message: "Backend LMS Online 🚀" });
 });
 
-// API Routes
 app.use("/api", globalRoutes);
 app.use("/api", paymentRoutes);
 app.use("/api", authRoutes);
@@ -40,7 +76,11 @@ app.use("/api", courseRoutes);
 app.use("/api", studentRoutes);
 app.use("/api", overviewRoutes);
 
+/* ==============================
+   LOCAL ONLY
+================================ */
 if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
     console.log(`Server running on PORT ${PORT}`);
   });
